@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
-BASE_DIR=$(cd "${BATS_TEST_FILENAME%/*}/../../.." && pwd -P)
+BATS_TEST_NAME_PREFIX='format/strfc: '
+
+BASE_DIR=$(cd "${BATS_TEST_DIRNAME}/../../.." && pwd -P)
 
 strfc() {
 	"${SHELL:-sh}" "${BASE_DIR}/lib/format/strfc.sh" "$@"

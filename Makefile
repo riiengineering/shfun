@@ -15,6 +15,6 @@ test/bats/bin/bats: test/bats test/test_helper/bats-assert
 	@touch $@
 
 test: test/bats/bin/bats .FORCE
-	test/bats/bin/bats -r test/lib
+	test/bats/bin/bats -F tap -r test/lib
 
 .FORCE:

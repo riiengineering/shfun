@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
-BASE_DIR=$(cd "${BATS_TEST_FILENAME%/*}/../../.." && pwd -P)
+BATS_TEST_NAME_PREFIX='url/urlencode: '
+
+BASE_DIR=$(cd "${BATS_TEST_DIRNAME}/../../.." && pwd -P)
 
 urlencode() {
 	"${SHELL:-sh}" "${BASE_DIR}/lib/url/urlencode.sh" "$@"
