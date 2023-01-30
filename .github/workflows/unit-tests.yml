@@ -1,0 +1,25 @@
+---
+name: unit-tests
+on: [push, pull_request]
+jobs:
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Information
+        run: |
+          uname -a
+          test/bats/bin/bats -v
+      - name: Run unit tests
+        env:
+          TERM: linux # fix tput for tty issue work around
+        run: |
+          make test
