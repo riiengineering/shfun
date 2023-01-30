@@ -3,10 +3,41 @@ name: unit-tests
 on: [push, pull_request]
 jobs:
   unit-tests:
+    env:
+      SHELL: ${{ matrix.sh }}
+      TERM: linux  # work around tput tty issue
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os:
+          - macos-12
+          - macos-11
+          - macos-10.15
+          - ubuntu-22.04
+          - ubuntu-20.04
+          - ubuntu-18.04
+        sh:
+          - sh  # default shell
+          - bash
+          - bb  # BusyBox
+          - dash
+          - ksh
+          - mksh
+          - mrsh  # https://mrsh.sh
+          - zsh
+        exclude:
+          # BusyBox not easily installable on macOS
+          - { os: macos-12, sh: bb }
+          - { os: macos-11, sh: bb }
+          - { os: macos-10.15, sh: bb }
+          # mrsh does not build on macOS
+          - { os: macos-10.15, sh: mrsh }
+          - { os: macos-11, sh: mrsh }
+          - { os: macos-12, sh: mrsh }
+          # mrsh: since we're building from source, testing different
+          #       Ubuntu versions doesn't make sense.
+          - { os: ubuntu-18.04, sh: mrsh }
+          - { os: ubuntu-20.04, sh: mrsh }
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
@@ -14,12 +45,63 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Prepare shell
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+          MATRIX_SH: ${{ matrix.sh }}
+        run: |
+          set -x
+          case ${MATRIX_OS%%-*}-${MATRIX_SH}
+          in
+            (macos-mksh)
+              brew install mksh ;;
+            (*-mrsh)
+              mrsh_src=${TMPDIR:-/tmp}/mrsh-build
+              git clone https://git.sr.ht/~emersion/mrsh "${mrsh_src:?}"
+              (
+                cd "${mrsh_src:?}" || exit 1
+                ./configure --prefix=~/.local --without-readline &&
+                make install
+              )
+              rm -rf "${mrsh_src:?}" ;;
+            (ubuntu-bash|ubuntu-dash|ubuntu-ksh|ubuntu-mksh|ubuntu-zsh)
+              sudo apt-get -y install ${MATRIX_SH} ;;
+            (ubuntu-bb)
+              sudo apt-get -y install busybox
+              mkdir -p ~/.local/bin
+              printf >~/.local/bin/bb "#!/bin/sh\\nBUSYBOX=%s\\ncase \$* in (--version) \"\${BUSYBOX}\" | sed -n -e '/^\$/q' -e 'p'; exit 0 ;; esac\\nexec \"\${BUSYBOX}\" sh \"\$@\"\\n" "$(command -v busybox)"
+              chmod +x ~/.local/bin/bb
+              ;;
+          esac
       - name: Information
         run: |
+          printf 'Kernel:\n'
           uname -a
+
+          printf '\nPATH:\n%s\n' "${PATH}"
+
+          printf '\nShell (%s):\n' "$(command -v "${SHELL}")"
+          case ${SHELL}
+          in
+            (bash|zsh)
+              "${SHELL}" --version ;;
+            (bb)
+              # (by the launcher script installed before)
+              "${SHELL}" --version ;;
+            (sh|dash)
+              case $(uname -s)
+              in
+                (Darwin)
+                  what $(command -v "${SHELL}") ;;
+              esac ;;
+            (ksh|mksh)
+              "${SHELL}" -c 'echo $0: ${KSH_VERSION}' ;;
+            (*)
+              printf '%s\n' ? ;;
+          esac
+
+          printf '\nbats:\n'
           test/bats/bin/bats -v
       - name: Run unit tests
-        env:
-          TERM: linux # fix tput for tty issue work around
         run: |
           make test
