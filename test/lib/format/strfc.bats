@@ -1,13 +1,14 @@
 #!/usr/bin/env bats
 
+BASE_DIR=$(cd "${BATS_TEST_FILENAME%/*}/../../.." && pwd -P)
+
+strfc() {
+	"${SHELL:-sh}" "${BASE_DIR}/lib/format/strfc.sh" "$@"
+}
+
 setup() {
-	BASE_DIR=$(cd "${BATS_TEST_FILENAME%/*}" && cd ../../.. && pwd -P)
-	TEST_DIR=${BASE_DIR:?}/test
-
-	load "${TEST_DIR:?}/test_helper/bats-support/load"
-	load "${TEST_DIR:?}/test_helper/bats-assert/load"
-
-	STRFC=${BASE_DIR}/lib/format/strfc.sh
+	load "${BASE_DIR:?}/test/test_helper/bats-support/load"
+	load "${BASE_DIR:?}/test/test_helper/bats-assert/load"
 }
 
 random_string() {
@@ -17,24 +18,24 @@ random_string() {
 }
 
 @test "empty string" {
-	run "${STRFC}" <<<''
+	run strfc <<<''
 	assert_output ''
 }
 
 @test "single replacement" {
-	run "${STRFC}" -t=test <<<'%t'
+	run strfc -t=test <<<'%t'
 	assert_output 'test'
 }
 
 @test "invalid format specifier" {
 	format='this is an invalid format specifier: %x'
-	run "${STRFC}" <<<"${format}"
+	run strfc <<<"${format}"
 	assert_output "$(sed 's/%.//g' <<<"${format}")"
 }
 
 @test "special characters (backslash)" {
 	x_value='abc\def'
-	run "${STRFC}" -x="${x_value}" <<<"%x"
+	run strfc -x="${x_value}" <<<"%x"
 	assert_output "${x_value}"
 }
 
@@ -50,7 +51,7 @@ random_string() {
 		format='a string with %c format specifiers: a simple one (%s) and a complex one (%x).'
 		expected="a string with ${c_value} format specifiers: a simple one (${s_value}) and a complex one (${x_value})."
 
-		run "${STRFC}" -c="${c_value}" -s="${s_value}" -x="${x_value}" <<<"${format}"
+		run strfc -c="${c_value}" -s="${s_value}" -x="${x_value}" <<<"${format}"
 		assert_output "${expected}"
 	done
 }
