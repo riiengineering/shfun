@@ -4,7 +4,8 @@ ARG_MAX=$(getconf ARG_MAX 2>/dev/null)
 test $((ARG_MAX)) -gt 0 || ARG_MAX=$((64 * 1024))
 
 # some space for the environment
-STRING_MAX_LEN=$((ARG_MAX - 8192))
+# source: https://www.in-ulm.de/~mascheck/various/argmax/
+STRING_MAX_LEN=$((ARG_MAX - $(env|wc -c) - 4*$(env|grep -ce '^[^ ]*=') - 128*1024))
 
 setup() {
 	BASE_DIR=$(cd "${BATS_TEST_FILENAME%/*}" && cd ../../.. && pwd -P)
