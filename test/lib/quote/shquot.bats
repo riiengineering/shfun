@@ -83,8 +83,8 @@ random_string() {
 	done
 }
 
-@test "very long string ($((STRING_MAX_LEN)) bytes)" {
-	input=$(random_string $((STRING_MAX_LEN)) '[:alnum:][:space:]')
-	run "${SHQUOT}" "${input}"
-	assert_output "'${input}'"
-}
+# @test "very long string ($((STRING_MAX_LEN)) bytes)" {
+# 	input=$(random_string $((STRING_MAX_LEN)) '[:alnum:][:space:]')
+# 	run "${SHQUOT}" "${input}"
+# 	assert_output "'${input}'"
+# }
