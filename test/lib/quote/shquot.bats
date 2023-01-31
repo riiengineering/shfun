@@ -14,14 +14,9 @@ shquot() {
 	"${SHELL:-sh}" "${BASE_DIR}/lib/quote/shquot.sh" "$@"
 }
 setup() {
-	load "${BASE_DIR:?}/test/test_helper/bats-support/load"
-	load "${BASE_DIR:?}/test/test_helper/bats-assert/load"
-}
-
-random_string() {
-	# usage: random_string [length] [character classes]
-	LC_ALL=C tr -dc "${2-'[:print:]'}" </dev/urandom \
-	| dd bs=1 count=${1-128} 2>/dev/null
+	load "${BASE_DIR:?}/test/test_helper/bats-support/load.bash"
+	load "${BASE_DIR:?}/test/test_helper/bats-assert/load.bash"
+	load "${BASE_DIR:?}/test/test_helper/functions.bash"
 }
 
 @test "empty string" {
