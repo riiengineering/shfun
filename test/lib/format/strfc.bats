@@ -1,4 +1,5 @@
 #!/usr/bin/env bats
+bats_require_minimum_version 1.8.0
 
 BATS_TEST_NAME_PREFIX='format/strfc: '
 
