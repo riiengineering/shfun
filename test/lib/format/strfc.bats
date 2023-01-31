@@ -4,14 +4,14 @@ BATS_TEST_NAME_PREFIX='format/strfc: '
 
 BASE_DIR=$(cd "${BATS_TEST_DIRNAME}/../../.." && pwd -P)
 
-strfc() {
-	"${SHELL:-sh}" "${BASE_DIR}/lib/format/strfc.sh" "$@"
-}
-
 setup() {
 	load "${BASE_DIR:?}/test/test_helper/bats-support/load.bash"
 	load "${BASE_DIR:?}/test/test_helper/bats-assert/load.bash"
 	load "${BASE_DIR:?}/test/test_helper/functions.bash"
+	load "${BASE_DIR:?}/test/test_helper/test_path.bash"
+
+	prepare_test_path
+	install_test_script strfc "${BASE_DIR}/lib/format/strfc.sh"
 }
 
 @test "empty string" {
@@ -34,6 +34,15 @@ setup() {
 	x_value='abc\def'
 	run strfc -x="${x_value}" <<<"%x"
 	assert_output "${x_value}"
+}
+
+@test "uses only built-ins and sed" {
+	ipath=$(isolated_path sed)
+
+	format='this is a %t which prints %f and %b.'
+
+	PATH=${ipath} run "$(command -v strfc)" -t=test -f=foo -b=bar <<<"${format}"
+	assert_output 'this is a test which prints foo and bar.'
 }
 
 @test "special characters (property test)" {

@@ -4,12 +4,14 @@ BATS_TEST_NAME_PREFIX='url/urlencode: '
 
 BASE_DIR=$(cd "${BATS_TEST_DIRNAME}/../../.." && pwd -P)
 
-urlencode() {
-	"${SHELL:-sh}" "${BASE_DIR}/lib/url/urlencode.sh" "$@"
-}
 setup() {
 	load "${BASE_DIR:?}/test/test_helper/bats-support/load"
 	load "${BASE_DIR:?}/test/test_helper/bats-assert/load"
+	load "${BASE_DIR:?}/test/test_helper/functions.bash"
+	load "${BASE_DIR:?}/test/test_helper/test_path.bash"
+
+	prepare_test_path
+	install_test_script urlencode "${BASE_DIR}/lib/url/urlencode.sh"
 }
 
 @test "empty string" {
@@ -30,6 +32,15 @@ setup() {
 @test "percent-encoding is capitalised" {
 	run urlencode '/'
 	assert_output '%2F'
+}
+
+@test "uses only built-ins and awk" {
+	ipath=$(isolated_path awk)
+
+	input='this is a test.'
+
+	PATH=${ipath} run "$(command -v urlencode)" "${input}"
+	assert_output 'this%20is%20a%20test.'
 }
 
 @test "RFC 3986 reserved characters" {

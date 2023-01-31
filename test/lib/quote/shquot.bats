@@ -10,13 +10,14 @@ test $((ARG_MAX)) -gt 0 || ARG_MAX=$((64 * 1024))
 # some space for the environment
 STRING_MAX_LEN=$((ARG_MAX - 8192))
 
-shquot() {
-	"${SHELL:-sh}" "${BASE_DIR}/lib/quote/shquot.sh" "$@"
-}
 setup() {
 	load "${BASE_DIR:?}/test/test_helper/bats-support/load.bash"
 	load "${BASE_DIR:?}/test/test_helper/bats-assert/load.bash"
 	load "${BASE_DIR:?}/test/test_helper/functions.bash"
+	load "${BASE_DIR:?}/test/test_helper/test_path.bash"
+
+	prepare_test_path
+	install_test_script shquot "${BASE_DIR}/lib/quote/shquot.sh"
 }
 
 @test "empty string" {
@@ -31,6 +32,14 @@ setup() {
 
 @test "'hello world'" {
 	run shquot 'hello world'
+	assert_output "'hello world'"
+}
+
+
+@test "uses only built-ins and sed" {
+	ipath=$(isolated_path sed)
+
+	PATH=${ipath} run "$(command -v shquot)" 'hello world'
 	assert_output "'hello world'"
 }
 
