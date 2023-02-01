@@ -24,6 +24,7 @@ jobs:
           - ksh
           - mksh
           - mrsh  # https://mrsh.sh
+          - yash
           - zsh
         exclude:
           # BusyBox not easily installable on macOS
@@ -53,8 +54,8 @@ jobs:
           set -x
           case ${MATRIX_OS%%-*}-${MATRIX_SH}
           in
-            (macos-mksh)
-              brew install mksh ;;
+            (macos-mksh|macos-yash)
+              brew install "${MATRIX_SH}" ;;
             (*-mrsh)
               mrsh_src=${TMPDIR:-/tmp}/mrsh-build
               git clone https://git.sr.ht/~emersion/mrsh "${mrsh_src:?}"
@@ -64,8 +65,8 @@ jobs:
                 make install
               )
               rm -rf "${mrsh_src:?}" ;;
-            (ubuntu-bash|ubuntu-dash|ubuntu-ksh|ubuntu-mksh|ubuntu-zsh)
-              sudo apt-get -y install ${MATRIX_SH} ;;
+            (ubuntu-bash|ubuntu-dash|ubuntu-ksh|ubuntu-mksh|ubuntu-yash|ubuntu-zsh)
+              sudo apt-get -y install "${MATRIX_SH}" ;;
             (ubuntu-bb)
               sudo apt-get -y install busybox
               mkdir -p ~/.local/bin
