@@ -3,18 +3,17 @@
 all:
 # TODO
 
-test/bats \
-test/test_helper/bats-assert \
-test/test_helper/bats-support:
-	test -d .git && git submodule update --init $@
+test/bats/.git \
+test/test_helper/bats-assert/.git \
+test/test_helper/bats-support/.git:
+	test -d .git && git submodule update --init $(@D)
 	@touch $@
 
-test/test_helper/bats-assert: test/test_helper/bats-support
+test/bats/bin/bats: test/bats/.git
+test/test_helper/bats-support/load: test/test_helper/bats-support/.git
+test/test_helper/bats-assert/load: test/test_helper/bats-assert/.git test/test_helper/bats-support/load
 
-test/bats/bin/bats: test/bats test/test_helper/bats-assert
-	@touch $@
-
-test: test/bats/bin/bats .FORCE
+test: test/bats/bin/bats test/test_helper/bats-assert/load .FORCE
 	test/bats/bin/bats -F tap -r test/lib
 
 .FORCE:
