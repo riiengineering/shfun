@@ -23,7 +23,6 @@ jobs:
           - dash
           - ksh
           - mksh
-          - mrsh  # https://mrsh.sh
           - yash
           - zsh
         exclude:
@@ -31,14 +30,15 @@ jobs:
           - { os: macos-12, sh: bb }
           - { os: macos-11, sh: bb }
           - { os: macos-10.15, sh: bb }
-          # mrsh does not build on macOS
-          - { os: macos-10.15, sh: mrsh }
-          - { os: macos-11, sh: mrsh }
-          - { os: macos-12, sh: mrsh }
+        include:
           # mrsh: since we're building from source, testing different
           #       Ubuntu versions doesn't make sense.
-          - { os: ubuntu-18.04, sh: mrsh }
-          - { os: ubuntu-20.04, sh: mrsh }
+          #       Also, Ubuntu only, because mrsh does not build on macOS.
+          - { os: ubuntu-22.04, sh: mrsh }  # https://mrsh.sh
+          # Policy-compliant Ordinary SHell
+          - { os: ubuntu-18.04, sh: posh }
+          - { os: ubuntu-20.04, sh: posh }
+          - { os: ubuntu-22.04, sh: posh }
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository code
@@ -65,7 +65,7 @@ jobs:
                 make install
               )
               rm -rf "${mrsh_src:?}" ;;
-            (ubuntu-bash|ubuntu-dash|ubuntu-ksh|ubuntu-mksh|ubuntu-yash|ubuntu-zsh)
+            (ubuntu-bash|ubuntu-dash|ubuntu-ksh|ubuntu-mksh|ubuntu-posh|ubuntu-yash|ubuntu-zsh)
               sudo apt-get -y install "${MATRIX_SH}" ;;
             (ubuntu-bb)
               sudo apt-get -y install busybox
@@ -75,6 +75,8 @@ jobs:
               ;;
           esac
       - name: Information
+        env:
+          MATRIX_OS: ${{ matrix.os }}
         run: |
           printf 'Kernel:\n'
           uname -a
@@ -98,7 +100,14 @@ jobs:
             (ksh|mksh)
               "${SHELL}" -c 'echo $0: ${KSH_VERSION}' ;;
             (*)
-              printf '%s\n' ? ;;
+              case ${MATRIX_OS%%-*}
+              in
+                (ubuntu)
+                  dpkg -s "${SHELL}" | sed -n 's/^Version: *//p' | grep ^ ;;
+                (*)
+                  false ;;
+              esac \
+              || printf '%s\n' ? ;;
           esac
 
           printf '\nbats:\n'
