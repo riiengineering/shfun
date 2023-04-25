@@ -10,6 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - macos-13
           - macos-12
           - macos-11
           - macos-10.15
@@ -26,6 +27,7 @@ jobs:
           - zsh
         exclude:
           # BusyBox not easily installable on macOS
+          - { os: macos-13, sh: bb }
           - { os: macos-12, sh: bb }
           - { os: macos-11, sh: bb }
           - { os: macos-10.15, sh: bb }
