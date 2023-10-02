@@ -117,14 +117,8 @@ jobs:
               || printf '%s\n' ? ;;
           esac
 
-          printf '\nbats:\n'
-          test/bats/bin/bats -v
-
           printf '\nShellSpec:\n'
           spec/.shellspec/bin/shellspec --version
-      - name: Run unit tests (bats)
-        run: |
-          make test
       - name: Run unit tests (ShellSpec)
         if: always()
         run: |
