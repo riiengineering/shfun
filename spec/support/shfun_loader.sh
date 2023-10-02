@@ -15,12 +15,11 @@ SetupCommandFromFile() {
 		(*.sh)
 			_script_interp=${SHELLSPEC_SHELL-} ;;
 	esac
-	printf '#!%s\n' "${_script_interp:-/bin/sh}" >"${_mock_dest:?}"
-	cat "${2:?}" >>"${_mock_dest:?}"
-	chmod +x "${_mock_dest:?}"
+	@printf '#!%s\n' "${_script_interp:-/bin/sh}" >"${_mock_dest:?}"
+	@cat "${2:?}" >>"${_mock_dest:?}"
+	@chmod +x "${_mock_dest:?}"
 
 	unset -v _mock_dest _script_interp
-
 }
 
 SetupFunctionFromFile() {
@@ -30,17 +29,17 @@ SetupFunctionFromFile() {
 		(*.bash|*.sh)
 			eval "${1:?} () {
 $(
-	if test -s "${2:?}"
+	if @test -s "${2:?}"
 	then
-		cat "${2:?}"
+		@cat "${2:?}"
 	else
-		echo ':'
+		@printf ':\n'
 	fi
 )
 }"
 			;;
 		(*)
-			echo 'invalid file extension for shell function code' >&2
+			@printf 'invalid file extension for shell function code\n' >&2
 			return 1
 			;;
 	esac
