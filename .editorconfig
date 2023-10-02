@@ -1,0 +1,31 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+max_line_length = 80
+trim_trailing_whitespace = true
+emacs_charset = utf-8-unix
+
+[{*.sh,*.bash}]
+indent_size = 4
+indent_style = tab
+file_type_emacs = sh
+
+[{*.awk,*.sed}]
+indent_size = 4
+indent_style = tab
+file_type_emacs = awk
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+file_type_emacs = makefile
+
+[spec/**.spec]
+indent_size = 2
+indent_style = space
+file_type_emacs = sh
