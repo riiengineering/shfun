@@ -49,7 +49,7 @@ Describe 'url/urlencode'
 
   It 'supports RFC 3986 unreserved characters'
     input='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~'
-    expected='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~'
+    expected=${input:?}
 
     When run command urlencode "${input}"
 
