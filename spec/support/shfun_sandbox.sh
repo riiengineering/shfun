@@ -1,5 +1,5 @@
 EnableSandbox() {
-	SHFUN_SANDBOX_DIR=$(@mktemp -d "${SHELLSPEC_TMPDIR:?}/sandbox.XXXXXX")
+	SHFUN_SANDBOX_DIR=$(@mktemp -d "${SHELLSPEC_WORKDIR:?}/sandbox.XXXXXX")
 
 	while test $# -gt 0
 	do
@@ -8,12 +8,16 @@ EnableSandbox() {
 	done
 
 	shellspec_before_all _ActivateSandbox
+	shellspec_after_all _RemoveSandbox
 }
 
 _ActivateSandbox() {
 	PATH="${SHELLSPEC_MOCK_BINDIR:?}:${SHELLSPEC_SUPPORT_BINDIR}:${SHFUN_SANDBOX_DIR:?}"
 	readonly PATH
 	export PATH
+}
+_RemoveSandbox() {
+	@rm -R "${SHFUN_SANDBOX_DIR:?}"
 }
 
 AllowExternalCommand() {
