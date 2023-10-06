@@ -1,9 +1,9 @@
 __strfc_c=$#
-while test $((__strfc_c)) -gt 0
+while case $((__strfc_c)) in (0) ! : ;; esac
 do
 	case $1
 	in
-		(-[[:alnum:]]=*)
+		(-[0-9A-Za-z]=*)
 			set -- "$@" -e "$(
 				sed <<-ARG \
 					-e 's|[/\\&]|\\&|g' \
@@ -18,10 +18,10 @@ do
 			;;
 	esac
 
-	shift 1
+	shift
 	: $((__strfc_c-=1))
 done
-unset __strfc_c
+unset -v __strfc_c
 
 # explanation:
 #  replace format specifiers with intermediate representation:
