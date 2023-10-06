@@ -2,6 +2,8 @@ Describe 'url/urldecode'
   EnableSandbox
   AllowExternalCommand awk
 
+  EnableLeakDetector
+
   SetupCommandFromFile urldecode lib/url/urldecode.sh
 
   It 'decodes an empty string'

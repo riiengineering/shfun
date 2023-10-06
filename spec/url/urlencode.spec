@@ -2,6 +2,8 @@ Describe 'url/urlencode'
   EnableSandbox
   AllowExternalCommand awk
 
+  EnableLeakDetector
+
   SetupCommandFromFile urlencode lib/url/urlencode.sh
 
   It 'encodes an empty string'

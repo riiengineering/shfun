@@ -2,6 +2,8 @@ Describe 'str/unique'
   EnableSandbox
   AllowExternalCommand awk
 
+  EnableLeakDetector
+
   SetupCommandFromFile unique lib/str/unique.sh
 
   NL='

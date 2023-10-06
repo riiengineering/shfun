@@ -2,6 +2,8 @@ Describe 'regex/breify'
   EnableSandbox
   AllowExternalCommand sed
 
+  EnableLeakDetector
+
   SetupCommandFromFile breify lib/regex/breify.sh
 
   It "'hello world'"

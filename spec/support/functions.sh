@@ -21,6 +21,6 @@ random_string() {
 	# silence stderr to suppress "/usr/bin/tr: write error: Broken pipe" in GitHub actions
 	{
 		LC_ALL=C @tr -dc "${2-'[:print:]'}" </dev/urandom \
-		| @dd bs=1 count=${1-128} 2>/dev/null
+		| @dd bs=1 count=${1-128}
 	} 2>/dev/null
 }
