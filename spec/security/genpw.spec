@@ -37,6 +37,7 @@ Describe 'security/genpw'
   }
 
   str_repeat() {
+    # lib/str/repeat.sh
     while case $(($1)) in (0) ! :;; esac
     do
       @printf '%s' "$2"
