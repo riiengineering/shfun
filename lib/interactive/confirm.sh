@@ -15,8 +15,10 @@ do
 	case ${__confirm_resp:-"${2-}"}
 	in
 		([Yy]|[Yy][Ee][Ss])
+			unset -v __confirm_resp
 			exit 0 ;;
 		([Nn]|[Nn][Oo])
+			unset -v __confirm_resp
 			exit 1 ;;
 		(*)
 			printf 'Please respond with "yes" or "no": ' ;;

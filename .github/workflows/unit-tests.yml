@@ -20,6 +20,7 @@ jobs:
           - bash
           - bb  # BusyBox
           - dash
+          - gwsh
           - ksh
           - mksh
           - yash
@@ -33,7 +34,11 @@ jobs:
           - { os: macos-13, sh: yash }
           - { os: macos-12, sh: yash }
           - { os: macos-11, sh: yash }
-        #include:
+        include:
+          # gwsh: since we're building from source, testing different
+          #       OS versions doesn't make sense.
+          - { os: ubuntu-22.04, sh: gwsh }
+          - { os: macos-13, sh: gwsh }
         # NOTE: mrsh and posh are temporarily disabled because they don't work
         #       with ShellSpec.
          #
@@ -59,14 +64,29 @@ jobs:
           set -x
           case ${MATRIX_OS%%-*}-${MATRIX_SH}
           in
+            (*-gwsh)
+              gwsh_src=${TMPDIR:-/tmp}/gwsh-build
+              git clone 'https://github.com/hvdijk/gwsh.git' "${gwsh_src:?}"
+              (
+                cd "${gwsh_src:?}" || exit 1
+                ./configure --prefix="${HOME:?}/.local" &&
+                make install
+                case ${MATRIX_OS%%-*}
+                in
+                  (macos)
+                    mkdir -p "${HOME:?}/bin"
+                    ln -s ../.local/bin/gwsh "${HOME:?}/bin/gwsh" ;;
+                esac
+              )
+              rm -rf "${gwsh_src:?}" ;;
             (macos-mksh|macos-yash)
               brew install "${MATRIX_SH}" ;;
             (*-mrsh)
               mrsh_src=${TMPDIR:-/tmp}/mrsh-build
-              git clone https://git.sr.ht/~emersion/mrsh "${mrsh_src:?}"
+              git clone 'https://git.sr.ht/~emersion/mrsh' "${mrsh_src:?}"
               (
                 cd "${mrsh_src:?}" || exit 1
-                ./configure --prefix=~/.local --without-readline &&
+                ./configure --prefix="${HOME:?}/.local" --without-readline &&
                 make install
               )
               rm -rf "${mrsh_src:?}" ;;
@@ -102,6 +122,8 @@ jobs:
                 (Darwin)
                   what $(command -v "${SHELL}") ;;
               esac ;;
+            (gwsh)
+              false ;;
             (ksh|mksh)
               "${SHELL}" -c 'echo $0: ${KSH_VERSION}' ;;
             (yash)
@@ -113,9 +135,9 @@ jobs:
                   dpkg -s "${SHELL}" | sed -n 's/^Version: *//p' | grep ^ ;;
                 (*)
                   false ;;
-              esac \
-              || printf '%s\n' ? ;;
-          esac
+              esac ;;
+          esac \
+          || printf '%s\n' '?'
 
           printf '\nShellSpec:\n'
           spec/.shellspec/bin/shellspec --version
