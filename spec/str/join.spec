@@ -2,6 +2,8 @@ Describe 'str/join'
   EnableSandbox
   AllowExternalCommand printf
 
+  EnableLeakDetector
+
   SetupCommandFromFile strjoin lib/str/join.sh
 
   It 'joins without arguments'

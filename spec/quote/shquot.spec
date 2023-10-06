@@ -2,6 +2,8 @@ Describe 'quote/shquot'
   EnableSandbox
   AllowExternalCommand sed
 
+  EnableLeakDetector
+
   SetupCommandFromFile shquot lib/quote/shquot.sh
 
   # ARG_MAX=$(getconf ARG_MAX 2>/dev/null)

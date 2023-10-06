@@ -2,6 +2,8 @@ Describe 'str/repeat'
   EnableSandbox
   AllowExternalCommand printf
 
+  EnableLeakDetector
+
   SetupCommandFromFile str_repeat lib/str/repeat.sh
 
   It 'repeats an empty string'

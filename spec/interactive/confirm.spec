@@ -2,6 +2,8 @@ Describe 'interactive/confirm'
   EnableSandbox
   AllowExternalCommand printf
 
+  EnableLeakDetector
+
   SetupCommandFromFile confirm lib/interactive/confirm.sh
 
   is_ksh() {

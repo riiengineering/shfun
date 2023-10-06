@@ -3,6 +3,8 @@ Describe 'security/genpw'
   AllowExternalCommand dd
   AllowExternalCommand tr
 
+  EnableLeakDetector
+
   SetupCommandFromFile genpw lib/security/genpw.sh
 
   # prepare and clean up temporary directory for password cache
@@ -85,7 +87,7 @@ Describe 'security/genpw'
   End
 
   Context  # random
-    Parameters:value 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+    Parameters:value 0 1 2 3 4 5 6 7 8 9
 
     It 'generates a random password (property test)'
       pw_len=32

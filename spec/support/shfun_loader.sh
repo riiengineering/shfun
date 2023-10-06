@@ -16,7 +16,16 @@ SetupCommandFromFile() {
 			_script_interp=${SHELLSPEC_SHELL-} ;;
 	esac
 	@printf '#!%s\n' "${_script_interp:-/bin/sh}" >"${_mock_dest:?}"
+
+	# leak detector hook
+	printf 'case ${LEAK_DUMPFILE} in (?*) %s; %s ;; esac\n' \
+		'set >"${LEAK_DUMPFILE}.cmdenter"' \
+		"trap 'set -- \$?; set >\"\${LEAK_DUMPFILE}.cmdexit\"; exit \$1' EXIT" \
+	>>"${_mock_dest:?}"
+
+	# script
 	@cat "${2:?}" >>"${_mock_dest:?}"
+
 	@chmod +x "${_mock_dest:?}"
 
 	unset -v _mock_dest _script_interp

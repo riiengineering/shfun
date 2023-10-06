@@ -2,6 +2,8 @@ Describe 'email/qpencode'
   EnableSandbox
   AllowExternalCommand awk
 
+  EnableLeakDetector
+
   SetupCommandFromFile qpencode lib/email/qpencode.sh
 
   It 'encodes an empty string'

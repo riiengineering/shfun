@@ -41,10 +41,16 @@
 	in
 		('')
 			# versions are equal if sort only prints one line
-			exit 0 ;;
+			unset -v _low _upp
+			exit 0
+			;;
 		("$2")
-			exit 1 ;;
+			unset -v _low _upp
+			exit 1
+			;;
 		("$1")
-			exit 255 ;;  # -1 + 256
+			unset -v _low _upp
+			exit 255  # -1 + 256
+			;;
 	esac
 }

@@ -4,6 +4,8 @@ Describe 'str/trim'
   AllowExternalCommand printf  # XXX: check if printf could be removed
   AllowExternalCommand sed
 
+  EnableLeakDetector
+
   SetupCommandFromFile strtrim lib/str/trim.sh
 
   It 'reads from stdin if no arguments are passed'

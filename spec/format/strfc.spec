@@ -3,6 +3,8 @@ Describe 'format/strfc'
   AllowExternalCommand printf
   AllowExternalCommand sed
 
+  EnableLeakDetector
+
   SetupCommandFromFile strfc lib/format/strfc.sh
 
   It 'accepts an empty string'

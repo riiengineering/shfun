@@ -3,6 +3,8 @@ Describe 'str/shuffle'
   AllowExternalCommand awk
   AllowExternalCommand date
 
+  EnableLeakDetector
+
   SetupCommandFromFile strshuffle lib/str/shuffle.sh
 
   sorted_output() {

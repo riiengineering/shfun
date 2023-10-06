@@ -2,6 +2,8 @@ Describe 'version/vercmp'
   EnableSandbox
   AllowExternalCommand sort
 
+  EnableLeakDetector
+
   SetupCommandFromFile vercmp lib/version/vercmp.sh
 
   It 'supports no arguments'

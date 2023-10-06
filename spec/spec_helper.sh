@@ -24,4 +24,6 @@ spec_helper_configure() {
 
   import 'support/shfun_loader'
   import 'support/shfun_sandbox'
+
+  import 'support/shfun_leakdetect'
 }
