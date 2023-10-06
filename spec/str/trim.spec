@@ -93,6 +93,4 @@ ipsum'
 ipsum'
     The stderr should equal ''
   End
-
-
 End
