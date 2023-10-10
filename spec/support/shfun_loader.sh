@@ -53,3 +53,9 @@ $(
 			;;
 	esac
 }
+
+SetupCHelper() {
+	have_cc || return 1
+
+	"${_CC:?}" -std=c99 -o "${SHELLSPEC_MOCK_BINDIR}/${1:?}" "${2:?}"
+}
