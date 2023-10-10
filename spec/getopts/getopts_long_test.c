@@ -15,6 +15,7 @@ struct test_data {
 	const char *it;
 	const char *optstring;
 	int optind;
+	const char *optarg;
 	char **argv;
 	int argc;
 };
@@ -38,12 +39,12 @@ struct test_data TESTS[] = {
 		.argv = TEST_ARGV("--illegal")
 	},
 	{
-		.it = "returns an unsupported option in OPTARG if the optstring starts with :",
+		.it = "returns an unsupported option in OPTARG_LONG if the optstring starts with :",
 		.optstring = ":foo,bar,baz",
 		.argv = TEST_ARGV("--illegal")
 	},
 	{
-		.it = "extracts a required argument in next ARGV",
+		.it = "extracts required arguments in next ARGV",
 		.optstring = "required:",
 		.argv = TEST_ARGV("--required", "foo")
 	},
@@ -68,7 +69,7 @@ struct test_data TESTS[] = {
 		.argv = TEST_ARGV("--required")
 	},
 	{
-		.it = "returns the option in OPTARG if a required argument is omitted and the optstring starts with :",
+		.it = "returns the option in OPTARG_LONG if a required argument is omitted and the optstring starts with :",
 		.optstring = ":required:",
 		.argv = TEST_ARGV("--required")
 	},
@@ -88,19 +89,22 @@ struct test_data TESTS[] = {
 		.argv = TEST_ARGV("--optional=foo")
 	},
 	{
-		.it = "sets OPTARG if an empty argument is passed after =",
+		.it = "sets OPTARG_LONG if an empty argument is passed after =",
 		.optstring = "optional?",
-		.argv = TEST_ARGV("--optional=")
+		.argv = TEST_ARGV("--optional="),
+		.optarg = "something"
 	},
 	{
-		.it = "unsets OPTARG for optional arguments",
+		.it = "unsets OPTARG_LONG if no optional argument is passed",
 		.optstring = "optional?",
-		.argv = TEST_ARGV("--optional")
+		.argv = TEST_ARGV("--optional"),
+		.optarg = "something"
 	},
 	{
 		.it = "prints an error if an unexpected argument is passed for a flag option (after =)",
 		.optstring = "flag",
-		.argv = TEST_ARGV("--flag=2")
+		.argv = TEST_ARGV("--flag=2"),
+		.optarg = "something"
 	},
 	{
 		.it = "handles an unexpected argument passed after a flag= option (optstring leading :)",
@@ -172,8 +176,13 @@ struct test_result *exec_test(struct test_data *test_data) {
 	dup2(fileno(_stdout), 1);
 	dup2(fileno(_stderr), 2);
 
+	char *optarg_set = (test_data->optarg ? strdup(test_data->optarg) : NULL);
+
 	int longidx = -1;
 	optind = (1 < test_data->optind ? test_data->optind : 1);
+	if (optarg_set) {
+		optarg = optarg_set;
+	}
 	int c = getopt_long(
 		test_data->argc, test_data->argv,
 		((!EMPTY_STRING(test_data->optstring) && ':' == test_data->optstring[0]) ? ":" : ""),
@@ -203,6 +212,7 @@ struct test_result *exec_test(struct test_data *test_data) {
 	res->stderr_data = dump_stream(_stderr);
 	chomp(res->stderr_data);
 
+	if (optarg_set) { free(optarg_set); }
 	free_longopts(longopts);
 
 	fclose(_stdout);
@@ -239,6 +249,7 @@ void spec_test(struct test_data *test_data) {
 		break;
 	}
 
+	char *optarg_set_q = (test_data->optarg ? shquot(test_data->optarg) : NULL);
 	char *optarg_q = (res->optarg ? shquot(res->optarg) : NULL);
 
 	char *stdout_q = shquot(res->stdout_data);
@@ -247,7 +258,11 @@ void spec_test(struct test_data *test_data) {
 	printf("  It %s\n", (example_name_q ? example_name_q : "''"));
 
 	if (1 < test_data->optind) {
-		printf("    OPTIND=%u\n", test_data->optind);
+		printf("    OPTIND_LONG=%u\n", test_data->optind);
+	}
+
+	if (optarg_set_q) {
+		printf("    OPTARG_LONG=%s\n", optarg_set_q);
 	}
 
 	printf("    When call getopts_long %s _opt",
@@ -274,18 +289,19 @@ void spec_test(struct test_data *test_data) {
 	}
 
 	if (optarg_q) {
-		printf("    The variable OPTARG should equal %s\n", optarg_q);
+		printf("    The variable OPTARG_LONG should equal %s\n", optarg_q);
 	} else {
-		printf("    The variable OPTARG should be undefined\n");
+		printf("    The variable OPTARG_LONG should be undefined\n");
 	}
 
-	printf("    The variable OPTIND should equal %u\n", res->optind);
+	printf("    The variable OPTIND_LONG should equal %u\n", res->optind);
 
 	printf("  End\n\n");
 
 	if (example_name_q) { free(example_name_q); }
 	if (optstring_q) { free(optstring_q); }
 	if (_opt_q) { free(_opt_q); }
+	if (optarg_set_q) { free(optarg_set_q); }
 	if (optarg_q) { free(optarg_q); }
 
 	if (stdout_q) { free(stdout_q); }

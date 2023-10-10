@@ -2,8 +2,8 @@ Describe 'getopts/getopts_long'
   EnableSandbox
 
   EnableLeakDetector
-  LeakAllowVariable OPTARG
-  LeakAllowVariable OPTIND
+  LeakAllowVariable OPTARG_LONG
+  LeakAllowVariable OPTIND_LONG
   LeakAllowVariable _opt
 
   SetupFunctionFromFile getopts_long lib/getopts/getopts_long.sh
@@ -26,13 +26,13 @@ Describe 'getopts/getopts_long'
           echo
           ;;
         (*)
-          echo "${_opt}${OPTARG:+=}${OPTARG-}"
+          echo "${_opt}${OPTARG_LONG:+=}${OPTARG_LONG-}"
           ;;
       esac
     done
     unset -v __proc_options_optstring
 
-    shift $((OPTIND-1))
+    shift $((OPTIND_LONG-1))
 
     case $#
     in
@@ -53,8 +53,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should be defined
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 1
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 1
     End
 
     It 'reports end of options when no options are passed'
@@ -65,8 +65,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should be defined
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 1
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 1
     End
 
     It 'prints an error when unsupported options are passed'
@@ -77,11 +77,11 @@ Describe 'getopts/getopts_long'
       The stderr should equal 'unrecognized option '\''--illegal'\'''
 
       The variable _opt should equal '?'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
-    It 'returns an unsupported option in OPTARG if the optstring starts with :'
+    It 'returns an unsupported option in OPTARG_LONG if the optstring starts with :'
       When call getopts_long ':foo,bar,baz' _opt --illegal
 
       The status should be success
@@ -89,8 +89,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal '?'
-      The variable OPTARG should equal 'illegal'
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal 'illegal'
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'extracts a required argument in next ARGV'
@@ -101,8 +101,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'required'
-      The variable OPTARG should equal 'foo'
-      The variable OPTIND should equal 3
+      The variable OPTARG_LONG should equal 'foo'
+      The variable OPTIND_LONG should equal 3
     End
 
     It 'extracts a required argument in next ARGV starting with -'
@@ -113,8 +113,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'required'
-      The variable OPTARG should equal '-not-an-option'
-      The variable OPTIND should equal 3
+      The variable OPTARG_LONG should equal '-not-an-option'
+      The variable OPTIND_LONG should equal 3
     End
 
     It 'extracts a required argument in next ARGV starting with --'
@@ -125,8 +125,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'required'
-      The variable OPTARG should equal '--not-an-option'
-      The variable OPTIND should equal 3
+      The variable OPTARG_LONG should equal '--not-an-option'
+      The variable OPTIND_LONG should equal 3
     End
 
     It 'extracts required arguments after ='
@@ -137,8 +137,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'required'
-      The variable OPTARG should equal 'foo'
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal 'foo'
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'prints an error if a required argument is missing'
@@ -149,11 +149,11 @@ Describe 'getopts/getopts_long'
       The stderr should equal 'option '\''--required'\'' requires an argument'
 
       The variable _opt should equal '?'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
-    It 'returns the option in OPTARG if a required argument is omitted and the optstring starts with :'
+    It 'returns the option in OPTARG_LONG if a required argument is omitted and the optstring starts with :'
       When call getopts_long ':required:' _opt --required
 
       The status should be success
@@ -161,8 +161,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal ':'
-      The variable OPTARG should equal 'required'
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal 'required'
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'accepts empty arguments'
@@ -173,8 +173,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'required'
-      The variable OPTARG should equal ''
-      The variable OPTIND should equal 3
+      The variable OPTARG_LONG should equal ''
+      The variable OPTIND_LONG should equal 3
     End
 
     It 'ignores optional arguments in next ARGV'
@@ -185,8 +185,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'optional'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'extracts optional arguments after ='
@@ -197,13 +197,12 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'optional'
-      The variable OPTARG should equal 'foo'
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal 'foo'
+      The variable OPTIND_LONG should equal 2
     End
 
-    It 'sets OPTARG if an empty argument is passed after ='
-      OPTARG=something
-
+    It 'sets OPTARG_LONG if an empty argument is passed after ='
+      OPTARG_LONG='something'
       When call getopts_long 'optional?' _opt --optional=
 
       The status should be success
@@ -211,11 +210,12 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'optional'
-      The variable OPTARG should equal ''
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal ''
+      The variable OPTIND_LONG should equal 2
     End
 
-    It 'unsets OPTARG for optional arguments'
+    It 'unsets OPTARG_LONG if no optional argument is passed'
+      OPTARG_LONG='something'
       When call getopts_long 'optional?' _opt --optional
 
       The status should be success
@@ -223,11 +223,12 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'optional'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'prints an error if an unexpected argument is passed for a flag option (after =)'
+      OPTARG_LONG='something'
       When call getopts_long 'flag' _opt --flag=2
 
       The status should be success
@@ -235,8 +236,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal 'option '\''--flag'\'' doesn'\''t allow an argument'
 
       The variable _opt should equal '?'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'handles an unexpected argument passed after a flag= option (optstring leading :)'
@@ -247,8 +248,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal '?'
-      The variable OPTARG should equal 'flag'
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should equal 'flag'
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'ignores an argument passed after a flag in the next ARGV'
@@ -259,12 +260,12 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should equal 'flag'
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'reports end of options when reaching a positional argument'
-      OPTIND=2
+      OPTIND_LONG=2
       When call getopts_long 'flag' _opt --flag 2
 
       The status should equal 255
@@ -272,12 +273,12 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should be defined
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 2
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 2
     End
 
     It 'respects --'
-      OPTIND=2
+      OPTIND_LONG=2
       When call getopts_long 'flag1,flag2,flag3' _opt --flag1 -- --flag3
 
       The status should equal 255
@@ -285,8 +286,8 @@ Describe 'getopts/getopts_long'
       The stderr should equal ''
 
       The variable _opt should be defined
-      The variable OPTARG should be undefined
-      The variable OPTIND should equal 3
+      The variable OPTARG_LONG should be undefined
+      The variable OPTIND_LONG should equal 3
     End
   End
 

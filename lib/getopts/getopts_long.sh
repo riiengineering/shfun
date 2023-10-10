@@ -5,10 +5,15 @@
 # all options are before positional arguments.
 #
 # e.g. getopts_long 'no-value,required-value:,optional-value?' _opt "$@"
+#
+# This function updates the global variables ${name}, OPTIND_LONG, OPTARG_LONG.
+# The _LONG suffix is added for shells which don’t behave nicely when the
+# standard OPTIND and OPTARG variables are re-used (hello, Zsh).
 
-: ${OPTIND:=1}
 
-unset -v OPTARG
+: ${OPTIND_LONG:=1}
+
+unset -v OPTARG_LONG
 
 case $#
 in
@@ -19,7 +24,7 @@ in
 (*)
 	# shift off all already processed arguments and save getopts_long arguments
 	set -- "$@" "${1?}" "${2:?}"
-	shift $((2 + OPTIND-1))
+	shift $((2 + OPTIND_LONG-1))
 
 	# save one or two (option + OPTARG) arguments and shift off rest of ARGV
 	case $#
@@ -62,8 +67,8 @@ in
 						read -r "$2" <<-EOF
 						${__optstring%%[:?,]*}
 						EOF
-						OPTARG=${3#--${__optstring%%[:?,]*}=}
-						: $((OPTIND+=1))
+						OPTARG_LONG=${3#--${__optstring%%[:?,]*}=}
+						: $((OPTIND_LONG+=1))
 						;;
 					(*)
 						read -r "$2" <<-EOF
@@ -75,14 +80,14 @@ in
 								read -r "$2" <<-EOF
 								?
 								EOF
-								OPTARG=${3%%=*}
-								OPTARG=${OPTARG#--}
+								OPTARG_LONG=${3%%=*}
+								OPTARG_LONG=${OPTARG_LONG#--}
 								;;
 							(*)
 								echo "option '--${__optstring%%[:?,]*}' doesn't allow an argument" >&2
 								;;
 						esac
-						: $((OPTIND+=1))
+						: $((OPTIND_LONG+=1))
 						;;
 				esac
 
@@ -92,7 +97,7 @@ in
 				read -r "$2" <<-EOF
 				${__optstring%%[:?,]*}
 				EOF
-				: $((OPTIND+=1))
+				: $((OPTIND_LONG+=1))
 
 				# option (value maybe in next argument)
 				case ${__optstring%%,*}
@@ -101,8 +106,8 @@ in
 						case ${4+hasv}
 						in
 							(hasv)
-								OPTARG=$4
-								: $((OPTIND+=1))
+								OPTARG_LONG=$4
+								: $((OPTIND_LONG+=1))
 								;;
 							(*)
 								case ${1}
@@ -111,7 +116,7 @@ in
 										read -r "$2" <<-EOF
 										:
 										EOF
-										OPTARG=${__optstring%%:*}
+										OPTARG_LONG=${__optstring%%:*}
 										;;
 									(*)
 										read -r "$2" <<-EOF
@@ -145,13 +150,13 @@ in
 				read -r "$2" <<-EOF
 				?
 				EOF
-				: $((OPTIND+=1))
+				: $((OPTIND_LONG+=1))
 
 				case ${1}
 				in
 					(':'*)
-						OPTARG=${3%%=*}
-						OPTARG=${OPTARG#--}
+						OPTARG_LONG=${3%%=*}
+						OPTARG_LONG=${OPTARG_LONG#--}
 						;;
 					(*)
 						echo "unrecognized option '$3'" >&2
@@ -168,7 +173,7 @@ in
 	# skip -- and terminate option list
 	read -r "$2" <<-EOF
 	EOF
-	: $((OPTIND+=1))
+	: $((OPTIND_LONG+=1))
 	return 255  # -1
 	;;
 (*)
