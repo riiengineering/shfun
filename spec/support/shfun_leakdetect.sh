@@ -14,13 +14,7 @@ LeakAllowVariable() {
 }
 
 _LeakDumpVariables() {
-	if test -n "${ZSH_VERSION+zsh}"
-	then
-		typeset
-	else
-		set
-	fi \
-	| _LeakFilterVariables
+	set | _LeakFilterVariables
 }
 
 _LeakFilterVariables() {
@@ -117,7 +111,7 @@ _LeakAssert() {
 
 	  /^[+-]/ {
 		  if (!_hdr) {
-			  print "The variables have been modified:"
+			  print (_hdr="The variables have been modified:")
 		  }
 
 		  print
