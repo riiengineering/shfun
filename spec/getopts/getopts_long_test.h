@@ -12,6 +12,17 @@
 
 // helpers
 
+char *filename(const char *s) {
+	char *res = "";
+	for (const char *c = s; *c; ++c) {
+		if ('/' == *c) {
+			res = (char *)c+1;
+		}
+	}
+
+	return res;
+}
+
 char *shquot(const char *s) {
 	if (NULL == s) { return NULL; }
 

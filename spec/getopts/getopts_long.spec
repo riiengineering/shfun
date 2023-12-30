@@ -93,7 +93,7 @@ Describe 'getopts/getopts_long'
       The variable OPTIND_LONG should equal 2
     End
 
-    It 'extracts a required argument in next ARGV'
+    It 'extracts required arguments in next ARGV'
       When call getopts_long 'required:' _opt --required foo
 
       The status should be success
@@ -106,7 +106,7 @@ Describe 'getopts/getopts_long'
     End
 
     It 'extracts a required argument in next ARGV starting with -'
-      When call getopts_long 'required:' _opt '--required' '-not-an-option'
+      When call getopts_long 'required:' _opt --required -not-an-option
 
       The status should be success
       The stdout should equal ''
@@ -118,7 +118,7 @@ Describe 'getopts/getopts_long'
     End
 
     It 'extracts a required argument in next ARGV starting with --'
-      When call getopts_long 'required:' _opt '--required' '--not-an-option'
+      When call getopts_long 'required:' _opt --required --not-an-option
 
       The status should be success
       The stdout should equal ''
@@ -130,7 +130,7 @@ Describe 'getopts/getopts_long'
     End
 
     It 'extracts required arguments after ='
-      When call getopts_long 'required:' _opt --required=foo
+      When call getopts_long 'required:' _opt --required='foo'
 
       The status should be success
       The stdout should equal ''
@@ -190,7 +190,7 @@ Describe 'getopts/getopts_long'
     End
 
     It 'extracts optional arguments after ='
-      When call getopts_long 'optional?' _opt --optional=foo
+      When call getopts_long 'optional?' _opt --optional='foo'
 
       The status should be success
       The stdout should equal ''
@@ -229,7 +229,7 @@ Describe 'getopts/getopts_long'
 
     It 'prints an error if an unexpected argument is passed for a flag option (after =)'
       OPTARG_LONG='something'
-      When call getopts_long 'flag' _opt --flag=2
+      When call getopts_long 'flag' _opt --flag='2'
 
       The status should be success
       The stdout should equal ''
@@ -241,7 +241,7 @@ Describe 'getopts/getopts_long'
     End
 
     It 'handles an unexpected argument passed after a flag= option (optstring leading :)'
-      When call getopts_long ':flag' _opt --flag=2
+      When call getopts_long ':flag' _opt --flag='2'
 
       The status should be success
       The stdout should equal ''

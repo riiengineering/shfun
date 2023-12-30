@@ -8,8 +8,13 @@
 #include <string.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #define DEBUG 0
+
+#define PROGNAME "getopts_long_test"
+
+char *MYNAME;
 
 struct test_data {
 	const char *it;
@@ -20,7 +25,7 @@ struct test_data {
 	int argc;
 };
 #define NUM_STR_ARGS(...) (sizeof((char *[]){__VA_ARGS__})/sizeof(char *))
-#define TEST_ARGV(...) ((char *[]){__FILE__, __VA_ARGS__}), .argc = (NUM_STR_ARGS(__VA_ARGS__)+1)
+#define TEST_ARGV(...) ((char *[]){PROGNAME, __VA_ARGS__}), .argc = (1+NUM_STR_ARGS(__VA_ARGS__))
 
 struct test_data TESTS[] = {
 	{
@@ -253,7 +258,18 @@ void spec_test(struct test_data *test_data) {
 	char *optarg_q = (res->optarg ? shquot(res->optarg) : NULL);
 
 	char *stdout_q = shquot(res->stdout_data);
-	char *stderr_q = shquot(res->stderr_data);
+
+	/* getopt_long(3) prefixes the error message with the executable name,
+	 * strip it because the shell implementation won't do so either */
+	char *stderr_q = NULL;
+	if (res->stderr_data == strstr(res->stderr_data, MYNAME)
+	    && ':' == res->stderr_data[strlen(MYNAME)]) {
+		stderr_q = res->stderr_data + strlen(MYNAME) + 1;
+		while (' ' == *stderr_q) { ++stderr_q; }
+		stderr_q = shquot(stderr_q);
+	} else {
+		stderr_q = shquot(res->stderr_data);
+	}
 
 	printf("  It %s\n", (example_name_q ? example_name_q : "''"));
 
@@ -268,9 +284,49 @@ void spec_test(struct test_data *test_data) {
 	printf("    When call getopts_long %s _opt",
 	       (optstring_q ? optstring_q : "''"));
 	for (int i = 1; i < test_data->argc; ++i) {
-		char *s = shquot(test_data->argv[i]);
-		printf(" %s", s);
-		if (s) { free(s); }
+		char *p = NULL, *q = NULL, *r = NULL;
+
+		const char *argstr = test_data->argv[i];
+
+		if (EMPTY_STRING(argstr)) {
+			printf(" ''");
+			continue;
+		}
+
+		/* skip over leading dashes and store in p */
+		while ('-' == *argstr) { ++argstr; }
+		if (argstr > test_data->argv[i]) {
+			p = strndup(test_data->argv[i], (argstr - test_data->argv[i]));
+		}
+
+		/* iterate over rest of argument string and check if there is something
+		 * to quote */
+		const char *c;
+		for (c = argstr; *c; ++c) {
+			if ('=' == *c) {
+				/* quote all (non-empty) values after a = */
+				q = strndup(argstr, (c+1 - argstr));
+				if (NUL != *(c+1)) { r = shquot(c+1); }
+				break;
+			}
+			if (!isalnum((int)*c) && '-' != *c && '_' != *c) {
+				/* quote all arguments containing non [[:alnum:]-_] characters
+				 * completely */
+				q = shquot(argstr);
+				break;
+			}
+		}
+		if (c > argstr && NUL == *c) {
+			/* no quoting was needed (we reached the end of string) */
+			r = strdup(argstr);
+		}
+
+		/* print result and free allocated memory */
+		printf(" %s%s%s", (p ? p : ""), (q ? q : ""), (r ? r : ""));
+
+		if (p) { free(p); }
+		if (q) { free(q); }
+		if (r) { free(r); }
 	}
 	printf("\n\n");
 	if (0 == status) {
@@ -315,6 +371,11 @@ void spec_test(struct test_data *test_data) {
 #define MODE_SPEC 2
 
 int main(int argc, char *argv[]) {
+	/* getopt_long(3) seems to take the basename of argv[0] for error messages.
+	 * we store this value in MYNAME for later manipulation of output error
+	 * messages. */
+	MYNAME = filename(argv[0]);
+
 	int mode = MODE_RUN;
 	if (1 < argc) {
 		if (0 == strcasecmp(argv[1], "run")) {
