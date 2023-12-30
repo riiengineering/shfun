@@ -178,5 +178,4 @@ void print_argv(int argc, char *const *argv) {
 	for (int i = 0; i < argc; ++i) {
 		printf("%s'%s'", (i ? " " : ""), argv[i]);
 	}
-	printf("\n");
 }

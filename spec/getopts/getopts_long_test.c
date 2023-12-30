@@ -154,6 +154,20 @@ struct test_result {
 	char *stderr_data;
 };
 
+void print_test_result(struct test_result *r) {
+	if (!EMPTY_STRING(r->stdout_data)) {
+		fprintf(stdout, "%s\n", r->stdout_data);
+	}
+	if (!EMPTY_STRING(r->stderr_data)) {
+		fprintf(stderr, "%s\n", r->stderr_data);
+	}
+	printf("return value: %d\n", r->return_value);
+	printf("optind=%d; ", r->optind);
+	printf("opterr=%d; ", r->opterr);
+	printf("optopt=%d; ", r->optopt);
+	printf(r->optarg ? "optarg=\"%s\"\n" : "optarg=%s\n", r->optarg);
+}
+
 void free_test_result(struct test_result *r) {
 	if (r->longoption) { free(r->longoption); }
 	if (r->optarg) { free(r->optarg); }
@@ -168,6 +182,7 @@ struct test_result *exec_test(struct test_data *test_data) {
 #if DEBUG
 	printf("ARGV = (%d) ", test_data->argc);
 		print_argv(test_data->argc, test_data->argv);
+		printf("\n");
 	printf("optstring = %s\n", test_data->optstring);
 	printf("longopts = "); print_longopts(longopts);
 #endif
@@ -227,7 +242,16 @@ struct test_result *exec_test(struct test_data *test_data) {
 }
 
 void run_test(struct test_data *test_data) {
+	printf("# It %s\n", test_data->it);
+	/* ideally this code would be shared with exec_test() but I was lazy... */
+	printf("getopt_long(%u, ", test_data->argc);
+	print_argv(test_data->argc, test_data->argv);
+	printf(", \"%s\", ..., ...);\n",
+		((!EMPTY_STRING(test_data->optstring) && ':' == test_data->optstring[0]) ? ":" : ""));
+
 	struct test_result *res = exec_test(test_data);
+	print_test_result(res);
+	printf("\n");
 	free_test_result(res);
 }
 
