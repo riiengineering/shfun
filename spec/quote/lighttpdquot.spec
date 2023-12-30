@@ -15,7 +15,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot ''
 
     The status should be success
-    The stdout should equal 'e""'
+    The stdout should equal '""'
     The stderr should equal ''
   End
 
@@ -23,7 +23,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot 'word'
 
     The status should be success
-    The stdout should equal 'e"word"'
+    The stdout should equal '"word"'
     The stderr should equal ''
   End
 
@@ -31,7 +31,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot 'hello world'
 
     The status should be success
-    The stdout should equal 'e"hello world"'
+    The stdout should equal '"hello world"'
     The stderr should equal ''
   End
 
@@ -39,7 +39,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot "It's a string"
 
     The status should be success
-    The stdout should equal 'e"It'\''s a string"'
+    The stdout should equal '"It'\''s a string"'
     The stderr should equal ''
   End
 
@@ -47,7 +47,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot 'This is "a value"'
 
     The status should be success
-    The stdout should equal 'e"This is \"a value\""'
+    The stdout should equal '"This is \"a value\""'
     The stderr should equal ''
   End
 
@@ -58,7 +58,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot "${lfstr}"
 
     The status should be success
-    The stdout should equal 'e"line 1\nline 2\nline 3"'
+    The stdout should equal '"line 1\nline 2\nline 3"'
     The stderr should equal ''
   End
 
@@ -69,7 +69,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot "${crstr}"
 
     The status should be success
-    The stdout should equal 'e"before\rmid\rafter"'
+    The stdout should equal '"before\rmid\rafter"'
     The stderr should equal ''
   End
 
@@ -80,7 +80,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot "${htstr}"
 
     The status should be success
-    The stdout should equal 'e"col 1\tcol 2\tcol 3"'
+    The stdout should equal '"col 1\tcol 2\tcol 3"'
     The stderr should equal ''
   End
 
@@ -91,7 +91,7 @@ Describe 'quote/lighttpdquot'
     When run command lighttpdquot "${bsstr}"
 
     The status should be success
-    The stdout should equal 'e"a\\b\\c"'
+    The stdout should equal '"a\\b\\c"'
     The stderr should equal ''
   End
 
@@ -111,7 +111,7 @@ Describe 'quote/lighttpdquot'
       When run command lighttpdquot "${randstr}"
 
       The status should be success
-      The stdout should equal "e\"${randstr}\""
+      The stdout should equal "\"${randstr}\""
       The stderr should equal ''
     End
   End
