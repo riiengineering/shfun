@@ -84,7 +84,7 @@ in
 								OPTARG_LONG=${OPTARG_LONG#--}
 								;;
 							(*)
-								echo "option '--${__optstring%%[:?,]*}' doesn't allow an argument" >&2
+								echo "option \`--${__optstring%%[:?,]*}' doesn't allow an argument" >&2
 								;;
 						esac
 						: $((OPTIND_LONG+=1))
@@ -122,7 +122,7 @@ in
 										read -r "$2" <<-EOF
 										?
 										EOF
-										echo "option '$3' requires an argument" >&2
+										echo "option \`$3' requires an argument" >&2
 										;;
 								esac
 
@@ -159,7 +159,7 @@ in
 						OPTARG_LONG=${OPTARG_LONG#--}
 						;;
 					(*)
-						echo "unrecognized option '$3'" >&2
+						echo "unrecognized option \`$3'" >&2
 						;;
 				esac
 

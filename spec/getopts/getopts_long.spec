@@ -74,7 +74,7 @@ Describe 'getopts/getopts_long'
 
       The status should be success
       The stdout should equal ''
-      The stderr should equal 'unrecognized option '\''--illegal'\'''
+      The stderr should equal 'unrecognized option `--illegal'\'''
 
       The variable _opt should equal '?'
       The variable OPTARG_LONG should be undefined
@@ -146,7 +146,7 @@ Describe 'getopts/getopts_long'
 
       The status should be success
       The stdout should equal ''
-      The stderr should equal 'option '\''--required'\'' requires an argument'
+      The stderr should equal 'option `--required'\'' requires an argument'
 
       The variable _opt should equal '?'
       The variable OPTARG_LONG should be undefined
@@ -233,7 +233,7 @@ Describe 'getopts/getopts_long'
 
       The status should be success
       The stdout should equal ''
-      The stderr should equal 'option '\''--flag'\'' doesn'\''t allow an argument'
+      The stderr should equal 'option `--flag'\'' doesn'\''t allow an argument'
 
       The variable _opt should equal '?'
       The variable OPTARG_LONG should be undefined
