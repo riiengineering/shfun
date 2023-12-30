@@ -1,43 +1,51 @@
-Describe 'quote/shquot'
+Describe 'quote/pyquot'
   EnableSandbox
   AllowExternalCommand sed
 
   EnableLeakDetector
 
-  SetupCommandFromFile shquot lib/quote/shquot.sh
+  SetupCommandFromFile pyquot lib/quote/pyquot.sh
 
-  # ARG_MAX=$(getconf ARG_MAX 2>/dev/null)
-  # test $((ARG_MAX)) -gt 0 || ARG_MAX=$((64 * 1024))
 
-  # # some space for the environment
-  # STRING_MAX_LEN=$((ARG_MAX - 8192))
+  # Check if a Python interpreter is available
+  @python -c 'import sys; sys.exit(0)' && __have_python=1 || __have_python=0
+  have_python() {
+    return $((! __have_python))
+  }
+  skip_python() {
+    return $((__have_python))
+  }
 
   eval_quoted_string() {
-    eval "@printf '%s' $1";
+    # the version using the ast module requires at least Python 2.6.
+    # an unsafe(!!) version for older versions is provided commented
+    have_python &&
+    @python -c 'import ast, sys; print(ast.literal_eval(sys.argv[1]))' "$1"
+    #@python -c 'import sys; print(eval(sys.argv[1]))' "$1"
   }
 
 
   It 'quotes an empty string'
-    When run command shquot ''
+    When run command pyquot ''
 
     The status should be success
-    The output should equal "''"
+    The output should equal '""'
     The error should equal ''
   End
 
   It "quotes 'word'"
-    When run command shquot 'word'
+    When run command pyquot 'word'
 
     The status should be success
-    The output should equal "'word'"
+    The output should equal '"word"'
     The error should equal ''
   End
 
   It "quotes 'hello world'"
-    When run command shquot 'hello world'
+    When run command pyquot 'hello world'
 
     The status should be success
-    The output should equal "'hello world'"
+    The output should equal '"hello world"'
     The error should equal ''
   End
 
@@ -46,10 +54,11 @@ Describe 'quote/shquot'
 
     It "concatenates multiple arguments with IFS '$1'"
       Skip  # FIXME
+      Skip if 'no Python interpreter available' skip_python
 
       old_IFS=$IFS
       IFS=$1
-      When run command shquot hello world
+      When run command pyquot hello world
       IFS=$old_IFS
 
       The status should be successful
@@ -70,20 +79,20 @@ Describe 'quote/shquot'
     It "quotes strings containing double quotes (property test)"
       format='a string which contains a double quote "%s" in the middle.'
 
-      When run command shquot "$(@printf "${format}" "$1")"
+      When run command pyquot "$(@printf "${format}" "$1")"
 
       The status should be success
-      The stdout should equal "$(@printf "'${format}'" "$1")"
+      The stdout should equal "\"$(@printf "${format}" "$1" | sed 's/"/\\"/g')\""
       The stderr should equal ''
     End
 
     It "quotes strings containing single quotes (property test)"
       format="a string which contains a single quote '%s' in the middle."
 
-      When run command shquot "$(@printf "${format}" "$1")"
+      When run command pyquot "$(@printf "${format}" "$1")"
 
       The status should be success
-      The stdout should equal "'$(@printf "${format}" "$1" | sed "s/'/'\\\\''/g")'"
+      The stdout should equal "\"$(@printf "${format}" "$1")\""
       The stderr should equal ''
     End
   End
@@ -98,8 +107,10 @@ Describe 'quote/shquot'
       done
     End
 
-    It "eval of quoted string in shell produces input (property test)"
-      When run command shquot "$1"
+    It "eval of quoted string in Python produces input (property test)"
+      Skip if 'no Python interpreter available' skip_python
+
+      When run command pyquot "$1"
 
       The status should be success
       The result of function eval_quoted_string should equal "$1"
@@ -118,7 +129,7 @@ Describe 'quote/shquot'
     End
 
     It "quotes a $1 bytes long string"
-      When run command shquot "$(random_string $(($1)) '[:alnum:][:space:]')"
+      When run command pyquot "$(random_string $(($1)) '[:alnum:][:space:]')"
 
       The status should be success
       # TODO: better check
