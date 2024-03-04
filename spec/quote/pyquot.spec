@@ -8,7 +8,8 @@ Describe 'quote/pyquot'
 
 
   # Check if a Python interpreter is available
-  @python -c 'import sys; sys.exit(0)' && __have_python=1 || __have_python=0
+  { @python -c 'import sys; sys.exit(0)' >/dev/null 2>&1; } \
+  && __have_python=1 || __have_python=0
   have_python() {
     return $((! __have_python))
   }
