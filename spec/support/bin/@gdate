@@ -1,0 +1,7 @@
+#!/bin/sh -e
+. "$SHELLSPEC_SUPPORT_BIN"
+case ${OSTYPE}
+in
+	(*darwin*) invoke gdate "$@" ;;
+	(*) invoke date "$@" ;;
+esac
