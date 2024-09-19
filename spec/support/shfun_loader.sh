@@ -1,34 +1,53 @@
 SetupCommandFromFile() {
 	# usage: SetupCommandFromFile command_name file_path
 
+	_enable_leak_detect=true
 	_mock_dest="${SHELLSPEC_MOCK_BINDIR:?}/${1:?}"
 	case ${2-}
 	in
 		(*.awk)
 			_script_interp=$(command -v awk) &&
-			_script_interp="${_script_interp} -f" ;;
+			_script_interp="${_script_interp} -f"
+			_enable_leak_detect=false
+			;;
 		(*.bash)
-			_script_interp=$(command -v bash) ;;
+			_script_interp=$(command -v bash)
+			;;
+		(*.ksh)
+			_script_interp=$(command -v ksh)
+			;;
 		(*.sed)
 			_script_interp=$(command -v sed) &&
-			_script_interp="${_script_interp} -f" ;;
+			_script_interp="${_script_interp} -f"
+			_enable_leak_detect=false
+			;;
 		(*.sh)
-			_script_interp=${SHELLSPEC_SHELL-} ;;
+			_script_interp=${SHELLSPEC_SHELL-}
+			;;
 	esac
 	@printf '#!%s\n' "${_script_interp:-/bin/sh}" >"${_mock_dest:?}"
 
-	# leak detector hook
-	printf 'case ${LEAK_DUMPFILE} in (?*) %s; %s ;; esac\n' \
-		'set >"${LEAK_DUMPFILE}.cmdenter"' \
-		"trap 'set -- \$?; set >\"\${LEAK_DUMPFILE}.cmdexit\"; exit \$1' EXIT" \
-	>>"${_mock_dest:?}"
+	if ${_enable_leak_detect?}
+	then
+		# leak detector hook
+		cat <<-'EOF' >>"${_mock_dest:?}"
+		case ${LEAK_DUMPFILE-}
+		in
+		  (?*)
+		    set >"${LEAK_DUMPFILE}.cmdenter"
+		    trap 'set -- $?; set >"${LEAK_DUMPFILE}.cmdexit"; exit $1' EXIT
+		    ;;
+		esac
+
+		EOF
+	fi
 
 	# script
 	@cat "${2:?}" >>"${_mock_dest:?}"
 
 	@chmod +x "${_mock_dest:?}"
 
-	unset -v _mock_dest _script_interp
+	unset -v _mock_dest _script_interp _enable_leak_detect
 }
 
 SetupFunctionFromFile() {
