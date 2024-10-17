@@ -10,10 +10,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - macos-15
           - macos-14
           - macos-13
-          - macos-12
-          - macos-11
+          - ubuntu-24.04
           - ubuntu-22.04
           - ubuntu-20.04
         sh:
@@ -28,20 +28,18 @@ jobs:
           - zsh
         exclude:
           # BusyBox not easily installable on macOS
+          - { os: macos-15, sh: bb }
           - { os: macos-14, sh: bb }
           - { os: macos-13, sh: bb }
-          - { os: macos-12, sh: bb }
-          - { os: macos-11, sh: bb }
           # HomeBrew's yash does not work with ShellSpec for some reason
+          - { os: macos-15, sh: yash }
           - { os: macos-14, sh: yash }
           - { os: macos-13, sh: yash }
-          - { os: macos-12, sh: yash }
-          - { os: macos-11, sh: yash }
         include:
           # gwsh: since we're building from source, testing different
           #       OS versions doesn't make sense.
-          - { os: ubuntu-22.04, sh: gwsh }
-          - { os: macos-14, sh: gwsh }  # arm
+          - { os: ubuntu-24.04, sh: gwsh }
+          - { os: macos-15, sh: gwsh }  # arm
           - { os: macos-13, sh: gwsh }  # x86
         # NOTE: mrsh and posh are temporarily disabled because they don't work
         #       with ShellSpec.
