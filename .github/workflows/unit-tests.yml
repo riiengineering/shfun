@@ -15,7 +15,6 @@ jobs:
           - macos-13
           - ubuntu-24.04
           - ubuntu-22.04
-          - ubuntu-20.04
         sh:
           - sh  # default shell
           - bash
@@ -49,7 +48,6 @@ jobs:
           #       Also, Ubuntu only, because mrsh does not build on macOS.
           #- { os: ubuntu-22.04, sh: mrsh }  # https://mrsh.sh
           # Policy-compliant Ordinary SHell
-          #- { os: ubuntu-20.04, sh: posh }
           #- { os: ubuntu-22.04, sh: posh }
     runs-on: ${{ matrix.os }}
     steps:
