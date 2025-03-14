@@ -34,6 +34,8 @@ jobs:
           - { os: macos-15, sh: yash }
           - { os: macos-14, sh: yash }
           - { os: macos-13, sh: yash }
+          # Ubuntu 24.04's yash does not work with ShellSpec for some reason
+          - { os: ubuntu-24.04, sh: yash }
         include:
           # gwsh: since we're building from source, testing different
           #       OS versions doesn't make sense.
