@@ -8,15 +8,15 @@ in
 	(1) set -- "$@" '' ;;
 esac
 
-_sep=$1
-shift
+__strjoin_sep=$1
+printf '%s' "$2"
+shift 2
 
-for _a
+while ! eval "${1+!} :"
 do
-	set -- "$@" "${_sep}" "$1"
+	printf '%s%s' "${__strjoin_sep}" "$1"
 	shift
 done
-unset _a _sep
+printf '\n'
 
-shift  # shift away first sep
-(IFS=''; printf '%s\n' "$*")
+unset -v __strjoin_sep

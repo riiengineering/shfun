@@ -45,4 +45,12 @@ Describe 'str/join'
     The stdout should equal 'foo, bar, baz'
     The stderr should equal ''
   End
+
+  It "joins empty fields"
+    When run command strjoin @ foo '' baz
+
+    The status should be success
+    The stdout should equal 'foo@@baz'
+    The stderr should equal ''
+  End
 End
